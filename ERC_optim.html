@@ -411,8 +411,8 @@ cov2cor(sigma.mat)</code></pre>
 <pre class="r"><code>vol_equal = sqrt( t(x_equal)%*%sigma.mat%*%x_equal )[1,1]
 vol_equal</code></pre>
 <pre><code>## [1] 0.1986674</code></pre>
-<pre class="r"><code>contibsl_equal_w = x_equal *(sigma.mat%*%x_equal/vol_equal)
-contibsl_equal_w</code></pre>
+<pre class="r"><code>contribs_equal_w = x_equal *(sigma.mat%*%x_equal/vol_equal)
+contribs_equal_w</code></pre>
 <pre><code>##            [,1]
 ## [1,] 0.06795276
 ## [2,] 0.05544756
@@ -455,8 +455,8 @@ x</code></pre>
 <pre class="r"><code>vol_ERC = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
 vol_ERC</code></pre>
 <pre><code>## [1] 0.1852622</code></pre>
-<pre class="r"><code>contibs = x *(sigma.mat%*%x/vol_ERC)
-contibs</code></pre>
+<pre class="r"><code>contribs = x *(sigma.mat%*%x/vol_ERC)
+contribs</code></pre>
 <pre><code>##            [,1]
 ## [1,] 0.04625730
 ## [2,] 0.04628192
@@ -479,8 +479,8 @@ x</code></pre>
 <pre class="r"><code>vol_ERC = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
 vol_ERC</code></pre>
 <pre><code>## [1] 0.1853196</code></pre>
-<pre class="r"><code>contibs = x *(sigma.mat%*%x/vol_ERC)
-contibs</code></pre>
+<pre class="r"><code>contribs = x *(sigma.mat%*%x/vol_ERC)
+contribs</code></pre>
 <pre><code>##            [,1]
 ## [1,] 0.04631525
 ## [2,] 0.04632421
@@ -503,8 +503,8 @@ x</code></pre>
 <pre class="r"><code>vol_ERC = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
 vol_ERC</code></pre>
 <pre><code>## [1] 0.1852944</code></pre>
-<pre class="r"><code>contibs = x *(sigma.mat%*%x/vol_ERC)
-contibs</code></pre>
+<pre class="r"><code>contribs = x *(sigma.mat%*%x/vol_ERC)
+contribs</code></pre>
 <pre><code>##            [,1]
 ## [1,] 0.04630081
 ## [2,] 0.04629671

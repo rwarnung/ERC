@@ -33,8 +33,8 @@ x_equal = matrix(c(1/4, 1/4, 1/4, 1/4), nrow=4)
 #+ 
 vol_equal = sqrt( t(x_equal)%*%sigma.mat%*%x_equal )[1,1]
 vol_equal
-contibsl_equal_w = x_equal *(sigma.mat%*%x_equal/vol_equal)
-contibsl_equal_w
+contribs_equal_w = x_equal *(sigma.mat%*%x_equal/vol_equal)
+contribs_equal_w
 
 #' # Equal Risk Contributions (ERC) portfolio
 #' Optimization with `constrOptim.nl` from package `alabama`.
@@ -70,8 +70,8 @@ x
 vol_ERC = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
 vol_ERC
 
-contibs = x *(sigma.mat%*%x/vol_ERC)
-contibs
+contribs = x *(sigma.mat%*%x/vol_ERC)
+contribs
 
 #' ## Choosing c = c_max-0.5
 #+
@@ -85,8 +85,8 @@ x = y2/sum(y2)
 x
 vol_ERC = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
 vol_ERC
-contibs = x *(sigma.mat%*%x/vol_ERC)
-contibs
+contribs = x *(sigma.mat%*%x/vol_ERC)
+contribs
 
 #' ## Choosing c = c_max-1
 #+
@@ -100,8 +100,8 @@ x = y3/sum(y3)
 x
 vol_ERC = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
 vol_ERC
-contibs = x *(sigma.mat%*%x/vol_ERC)
-contibs
+contribs = x *(sigma.mat%*%x/vol_ERC)
+contribs
 
 options(warn = oldw)
 #' ## Conclusion
