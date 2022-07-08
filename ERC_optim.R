@@ -120,9 +120,9 @@ contribs
 #' $$\sqrt{x^T \Sigma x} \rightarrow Min$$ 
 #' subject to
 #' \begin{align*}
-#'    x_i > 0 \\
-#'    \sum_{i=1}^n x_i = 1 \\
-#'    \sum_{i=1}^n \ln x_i \ge c.
+#'    x_i &>& 0 \\
+#'    \sum_{i=1}^n x_i &=& 1 \\
+#'    \sum_{i=1}^n \ln x_i &\ge& c^*.
 #' \end{align*}
 #' 
 #' We define a new constraint function and fix the constant to $c^* = c - n \ln( \sum_{i=1}^n y_i)$. Where $c$ was used to derive the solution $y$.
