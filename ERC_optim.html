@@ -528,9 +528,9 @@ scaling.</p>
 <h1>Direct derivation of the ERC portfolio without scaling</h1>
 <p>This time we solve the following optimization problem: <span class="math display">\[\sqrt{x^T \Sigma x} \rightarrow Min\]</span>
 subject to <span class="math display">\[\begin{align*}
-   x_i &amp;&gt;&amp; 0 \\
-   \sum_{i=1}^n x_i &amp;=&amp; 1 \\
-   \sum_{i=1}^n \ln x_i &amp;\ge&amp; c^*.
+   x_i &amp;&gt; 0 \\
+   \sum_{i=1}^n x_i &amp;= 1 \\
+   \sum_{i=1}^n \ln x_i &amp;\ge c^*.
 \end{align*}\]</span></p>
 <p>We define a new constraint function and fix the constant to <span class="math inline">\(c^* = c - n \ln( \sum_{i=1}^n y_i)\)</span>. Where
 <span class="math inline">\(c\)</span> was used to derive the solution
