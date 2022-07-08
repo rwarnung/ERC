@@ -4,4 +4,4 @@ the Properties of Equally-Weighted Risk Contributions Portfolios by Teiletche an
 
 Go to `ERC_optim.R` for the optimization code and see the whole procedure at `ERC_optim.html`.
 
-For a [direct preview of the html go to](https://htmlpreview.github.io/?https://github.com/rwarnung/ERC/blob/master/ERC_optim.html).
+For a [direct preview follow this link](https://htmlpreview.github.io/?https://github.com/rwarnung/ERC/blob/master/ERC_optim.html).
