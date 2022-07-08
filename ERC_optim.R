@@ -1,7 +1,7 @@
 #' ---
-#' title: "ERC by optimization "
+#' title: "Equally-Weighted Risk Contributions by optimization "
 #' author: "Richard Warnung"
-#' date: "June 6, 2022"
+#' date: "July 8, 2022"
 #'---
 
 #' # Introduction
@@ -36,9 +36,17 @@ vol_equal
 contribs_equal_w = x_equal *(sigma.mat%*%x_equal/vol_equal)
 contribs_equal_w
 
-#' # Equal Risk Contributions (ERC) portfolio
+#' # Equally-Weighted Risk Contributions (ERC) portfolio
 #' Optimization with `constrOptim.nl` from package `alabama`.
-
+#' We first solve the problem
+#' $$\sqrt{y^T \Sigma y} \rightarrow Min$$ 
+#' subject to
+#' \begin{align*}
+#'    y_i > 0 \\
+#'    \sum \ln y_i \ge c
+#'\end{align*} 
+#' Then we rescale $x_i = y_i/\sum_{i=1}^n y_i$ to get the ERC portfolio.
+#' 
 #+ 
 library(alabama)
 
@@ -103,6 +111,65 @@ vol_ERC
 contribs = x *(sigma.mat%*%x/vol_ERC)
 contribs
 
-options(warn = oldw)
 #' ## Conclusion
+#' 
 #' As long as $c$ is below the upper bound $-n \log(n)$, solutions $y$ are different but lead to the ERC after scaling.
+#' 
+#' # Direct derivation of the ERC portfolio without scaling
+#' This time we solve the following optimization problem: 
+#' $$\sqrt{x^T \Sigma x} \rightarrow Min$$ 
+#' subject to
+#' \begin{align*}
+#'    x_i > 0 \\
+#'    \sum_{i=1}^n x_i = 1 \\
+#'    \sum_{i=1}^n \ln x_i \ge c.
+#' \end{align*}
+#' 
+#' We define a new constraint function and fix the constant to $c^* = c - n \ln( \sum_{i=1}^n y_i)$. Where $c$ was used to derive the solution $y$.
+#' According to Teiletche and Roncalli this will result in the ECR directly without the need to rescale.
+#+ 
+c_star = c - length(y3)*log(sum(y3))
+constr_fn_star = function(par){
+  h = rep(NA, length(par)+1)
+  h[1:length(par)] = par # par[i] > 0
+  h[length(par)+1] =  sum(log(par))-c_star  # sum(log(par)) > c*
+  return( h )
+}
+
+constr_eq_fn = function(par){
+  h = rep(NA,1)
+  h[1] = sum(par)-1 
+}
+
+ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, heq = constr_eq_fn, control.outer = list(trace = FALSE))  
+
+x = ans$par
+x
+sum(x)
+
+vol_ERC = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
+vol_ERC
+contribs = x *(sigma.mat%*%x/vol_ERC)
+contribs
+
+
+
+#' We see that the solution $x$ gives the ERC (apart from numerical inaccuracies).
+#' Next we investigate what happens if we change the constant c_star. We go back to the initial constant $c^* = c$.
+#+
+
+c_star = c 
+ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, heq = constr_eq_fn, control.outer = list(trace = FALSE))  
+
+x = ans$par
+x
+sum(x)
+
+vol_pf = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
+vol_pf
+contribs = x *(sigma.mat%*%x/vol_pf)
+contribs
+
+#' We see that the portfolio constraint is still fulfilled, but the ERC-property is not fulfilled. The volatility is lower than in the case of the ERC.
+#+ include=FALSE
+options(warn = oldw)

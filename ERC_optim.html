@@ -11,9 +11,9 @@
 
 <meta name="author" content="Richard Warnung" />
 
-<meta name="date" content="2022-06-06" />
+<meta name="date" content="2022-07-08" />
 
-<title>ERC by optimization</title>
+<title>Equally-Weighted Risk Contributions by optimization</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -365,9 +365,10 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">ERC by optimization</h1>
+<h1 class="title toc-ignore">Equally-Weighted Risk Contributions by
+optimization</h1>
 <h4 class="author">Richard Warnung</h4>
-<h4 class="date">June 6, 2022</h4>
+<h4 class="date">July 8, 2022</h4>
 
 </div>
 
@@ -419,10 +420,15 @@ contribs_equal_w</code></pre>
 ## [3,] 0.04341426
 ## [4,] 0.03185285</code></pre>
 </div>
-<div id="equal-risk-contributions-erc-portfolio" class="section level1">
-<h1>Equal Risk Contributions (ERC) portfolio</h1>
+<div id="equally-weighted-risk-contributions-erc-portfolio" class="section level1">
+<h1>Equally-Weighted Risk Contributions (ERC) portfolio</h1>
 <p>Optimization with <code>constrOptim.nl</code> from package
-<code>alabama</code>.</p>
+<code>alabama</code>. We first solve the problem <span class="math display">\[\sqrt{y^T \Sigma y} \rightarrow Min\]</span>
+subject to <span class="math display">\[\begin{align*}
+   y_i &gt; 0 \\
+   \sum \ln y_i \ge c
+\end{align*}\]</span> Then we rescale <span class="math inline">\(x_i =
+y_i/\sum_{i=1}^n y_i\)</span> to get the ERC portfolio.</p>
 <pre class="r"><code>library(alabama)
 
 objective_fn = function(par){
@@ -510,7 +516,6 @@ contribs</code></pre>
 ## [2,] 0.04629671
 ## [3,] 0.04628569
 ## [4,] 0.04641123</code></pre>
-<pre class="r"><code>options(warn = oldw)</code></pre>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
@@ -518,6 +523,75 @@ contribs</code></pre>
 bound <span class="math inline">\(-n \log(n)\)</span>, solutions <span class="math inline">\(y\)</span> are different but lead to the ERC after
 scaling.</p>
 </div>
+</div>
+<div id="direct-derivation-of-the-erc-portfolio-without-scaling" class="section level1">
+<h1>Direct derivation of the ERC portfolio without scaling</h1>
+<p>This time we solve the following optimization problem: <span class="math display">\[\sqrt{x^T \Sigma x} \rightarrow Min\]</span>
+subject to <span class="math display">\[\begin{align*}
+   x_i &gt; 0 \\
+   \sum_{i=1}^n x_i = 1 \\
+   \sum_{i=1}^n \ln x_i \ge c.
+\end{align*}\]</span></p>
+<p>We define a new constraint function and fix the constant to <span class="math inline">\(c^* = c - n \ln( \sum_{i=1}^n y_i)\)</span>. Where
+<span class="math inline">\(c\)</span> was used to derive the solution
+<span class="math inline">\(y\)</span>. According to Teiletche and
+Roncalli this will result in the ECR directly without the need to
+rescale.</p>
+<pre class="r"><code>c_star = c - length(y3)*log(sum(y3))
+constr_fn_star = function(par){
+  h = rep(NA, length(par)+1)
+  h[1:length(par)] = par # par[i] &gt; 0
+  h[length(par)+1] =  sum(log(par))-c_star  # sum(log(par)) &gt; c*
+  return( h )
+}
+
+constr_eq_fn = function(par){
+  h = rep(NA,1)
+  h[1] = sum(par)-1 
+}
+
+ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, heq = constr_eq_fn, control.outer = list(trace = FALSE))  
+
+x = ans$par
+x</code></pre>
+<pre><code>## [1] 0.1751560 0.2102794 0.2635812 0.3509835</code></pre>
+<pre class="r"><code>sum(x)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>vol_ERC = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
+vol_ERC</code></pre>
+<pre><code>## [1] 0.1852945</code></pre>
+<pre class="r"><code>contribs = x *(sigma.mat%*%x/vol_ERC)
+contribs</code></pre>
+<pre><code>##            [,1]
+## [1,] 0.04625284
+## [2,] 0.04627510
+## [3,] 0.04641645
+## [4,] 0.04635011</code></pre>
+<p>We see that the solution <span class="math inline">\(x\)</span> gives
+the ERC (apart from numerical inaccuracies). Next we investigate what
+happens if we change the constant c_star. We go back to the initial
+constant <span class="math inline">\(c^* = c\)</span>.</p>
+<pre class="r"><code>c_star = c 
+ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, heq = constr_eq_fn, control.outer = list(trace = FALSE))  
+
+x = ans$par
+x</code></pre>
+<pre><code>## [1] 0.09017221 0.12900806 0.22044347 0.56037626</code></pre>
+<pre class="r"><code>sum(x)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>vol_pf = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
+vol_pf</code></pre>
+<pre><code>## [1] 0.1668242</code></pre>
+<pre class="r"><code>contribs = x *(sigma.mat%*%x/vol_pf)
+contribs</code></pre>
+<pre><code>##            [,1]
+## [1,] 0.02259324
+## [2,] 0.02723812
+## [3,] 0.03817314
+## [4,] 0.07881973</code></pre>
+<p>We see that the portfolio constraint is still fulfilled, but the
+ERC-property is not fulfilled. The volatility is lower than in the case
+of the ERC.</p>
 </div>
 
 
