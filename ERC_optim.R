@@ -53,6 +53,7 @@ library(alabama)
 objective_fn = function(par){
   return( (t(par)%*%sigma.mat%*%par)[1,1]) ## no square-root, same arg min
 }
+
 c_max = -nrow(sigma.mat)*log(nrow(sigma.mat))
 
 constr_fn = function(par){
@@ -125,7 +126,7 @@ contribs
 #'    \sum_{i=1}^n \ln x_i &\ge c^*.
 #' \end{align*}
 #' 
-#' We define a new constraint function and fix the constant to $c^* = c - n \ln( \sum_{i=1}^n y_i)$. Where $c$ was used to derive the solution $y$.
+#' We define a new constraint function and fix the constant to $c^{\ast} = c - n \ln( \sum_{i=1}^n y_i^{\ast})$. Where $c$ was used to derive the optimal solution $y^{\ast}$.
 #' According to Teiletche and Roncalli this will result in the ECR directly without the need to rescale.
 #+ 
 c_star = c - length(y3)*log(sum(y3))
@@ -153,8 +154,10 @@ contribs = x *(sigma.mat%*%x/vol_ERC)
 contribs
 
 
-
 #' We see that the solution $x$ gives the ERC (apart from numerical inaccuracies).
+#' 
+#' ## Changing the constant $c^*$
+#' 
 #' Next we investigate what happens if we change the constant c_star. We go back to the initial constant $c^* = c$.
 #+
 
@@ -171,5 +174,66 @@ contribs = x *(sigma.mat%*%x/vol_pf)
 contribs
 
 #' We see that the portfolio constraint is still fulfilled, but the ERC-property is not fulfilled. The volatility is lower than in the case of the ERC.
+#' 
+#' ## Removing the portfolio constraint
+#' 
+#' Next we investigate the result if we remove the portfolio constraint $\sum x_i = 1$:
+
+c_star = c - length(y3)*log(sum(y3))
+ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, control.outer = list(trace = FALSE))  
+
+x = ans$par
+x
+sum(x)
+
+vol_pf = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
+vol_pf
+contribs = x *(sigma.mat%*%x/vol_pf)
+contribs
+
+#' The ERC and the portfolio property are fulfilled.
+#' 
+#' 
+
+#' ## Changing the objective function
+#' 
+#' Due to the dominance of the condition $\sum_{i=1}^n \ln x_i \ge c^{\ast}$ we investigate whether we can replace the objective function by another convex function. We choose
+#' the L2-norm $\sum_{i=1}^n x_i^2$.
+#' 
+#+
+#+ 
+
+objective_fn = function(par){
+  return(  sum(par^2) ) ## norm as objective function
+}
+
+ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, control.outer = list(trace = FALSE))  
+
+x = ans$par
+x
+sum(x)
+
+vol_pf = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
+vol_pf
+contribs = x *(sigma.mat%*%x/vol_pf)
+contribs
+
+#' Changing the objective function destroys the ERC property.
+#'
+#' ## Derivation of the mathematics
+#' 
+#' Let us see why $c^{\ast} = c - n \ln( \sum_{i=1}^n y_i^{\ast})$ gives the correct solution.
+#' Looking at the constraint $\sum_{i=1}^n \ln x_i \ge c^{\ast}$ it follows due to the Kuhn–Tucker conditions that the inequality is actually reached:
+#' $$
+#'  \sum_{i=1}^n \ln x_i = c^*
+#' $$
+#' Then we insert for $c^*$ and due to the choice of $c$ we can also insert $c = \sum_{i=1}^n \ln(y_i^{\ast})$:
+#'\begin{align*}
+#'  \sum_{i=1}^n \ln x_i &= c - n \ln( \sum_{i=1}^n y_i^{\ast}) \\
+#'  \sum_{i=1}^n \ln x_i &= \sum_{i=1}^n \ln(y_i^{\ast}) - n \ln( \sum_{i=1}^n y_i^{\ast})  \\
+#'  \sum_{i=1}^n \ln x_i &= \sum_{i=1}^n \ln \left( \frac{y_i^{\ast}}{\sum_{i=1}^n y_i^{\ast}} \right).
+#'\end{align*}
+#'
+
 #+ include=FALSE
 options(warn = oldw)

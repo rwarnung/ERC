@@ -434,6 +434,7 @@ y_i/\sum_{i=1}^n y_i\)</span> to get the ERC portfolio.</p>
 objective_fn = function(par){
   return( (t(par)%*%sigma.mat%*%par)[1,1]) ## no square-root, same arg min
 }
+
 c_max = -nrow(sigma.mat)*log(nrow(sigma.mat))
 
 constr_fn = function(par){
@@ -532,9 +533,9 @@ subject to <span class="math display">\[\begin{align*}
    \sum_{i=1}^n x_i &amp;= 1 \\
    \sum_{i=1}^n \ln x_i &amp;\ge c^*.
 \end{align*}\]</span></p>
-<p>We define a new constraint function and fix the constant to <span class="math inline">\(c^* = c - n \ln( \sum_{i=1}^n y_i)\)</span>. Where
-<span class="math inline">\(c\)</span> was used to derive the solution
-<span class="math inline">\(y\)</span>. According to Teiletche and
+<p>We define a new constraint function and fix the constant to <span class="math inline">\(c^{\ast} = c - n \ln( \sum_{i=1}^n
+y_i^{\ast})\)</span>. Where <span class="math inline">\(c\)</span> was
+used to derive the optimal solution <span class="math inline">\(y^{\ast}\)</span>. According to Teiletche and
 Roncalli this will result in the ECR directly without the need to
 rescale.</p>
 <pre class="r"><code>c_star = c - length(y3)*log(sum(y3))
@@ -568,9 +569,12 @@ contribs</code></pre>
 ## [3,] 0.04641645
 ## [4,] 0.04635011</code></pre>
 <p>We see that the solution <span class="math inline">\(x\)</span> gives
-the ERC (apart from numerical inaccuracies). Next we investigate what
-happens if we change the constant c_star. We go back to the initial
-constant <span class="math inline">\(c^* = c\)</span>.</p>
+the ERC (apart from numerical inaccuracies).</p>
+<div id="changing-the-constant-c" class="section level2">
+<h2>Changing the constant <span class="math inline">\(c^*\)</span></h2>
+<p>Next we investigate what happens if we change the constant c_star. We
+go back to the initial constant <span class="math inline">\(c^* =
+c\)</span>.</p>
 <pre class="r"><code>c_star = c 
 ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, heq = constr_eq_fn, control.outer = list(trace = FALSE))  
 
@@ -592,6 +596,78 @@ contribs</code></pre>
 <p>We see that the portfolio constraint is still fulfilled, but the
 ERC-property is not fulfilled. The volatility is lower than in the case
 of the ERC.</p>
+</div>
+<div id="removing-the-portfolio-constraint" class="section level2">
+<h2>Removing the portfolio constraint</h2>
+<p>Next we investigate the result if we remove the portfolio constraint
+<span class="math inline">\(\sum x_i = 1\)</span>:</p>
+<pre class="r"><code>c_star = c - length(y3)*log(sum(y3))
+ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, control.outer = list(trace = FALSE))  
+
+x = ans$par
+x</code></pre>
+<pre><code>## [1] 0.1752743 0.2109839 0.2637872 0.3493023</code></pre>
+<pre class="r"><code>sum(x)</code></pre>
+<pre><code>## [1] 0.9993477</code></pre>
+<pre class="r"><code>vol_pf = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
+vol_pf</code></pre>
+<pre><code>## [1] 0.1852951</code></pre>
+<pre class="r"><code>contribs = x *(sigma.mat%*%x/vol_pf)
+contribs</code></pre>
+<pre><code>##            [,1]
+## [1,] 0.04628710
+## [2,] 0.04644515
+## [3,] 0.04645623
+## [4,] 0.04610666</code></pre>
+<p>The ERC and the portfolio property are fulfilled.</p>
+</div>
+<div id="changing-the-objective-function" class="section level2">
+<h2>Changing the objective function</h2>
+<p>Due to the dominance of the condition <span class="math inline">\(\sum_{i=1}^n \ln x_i \ge c^{\ast}\)</span> we
+investigate whether we can replace the objective function by another
+convex function. We choose the L2-norm <span class="math inline">\(\sum_{i=1}^n x_i^2\)</span>.</p>
+<pre class="r"><code>objective_fn = function(par){
+  return(  sum(par^2) ) ## norm as objective function
+}
+
+ans = constrOptim.nl(par = c(0.18, 0.22, 0.29, 0.31), fn = objective_fn, hin = constr_fn_star, control.outer = list(trace = FALSE))  
+
+x = ans$par
+x</code></pre>
+<pre><code>## [1] 0.2545041 0.2409576 0.2353159 0.2361217</code></pre>
+<pre class="r"><code>sum(x)</code></pre>
+<pre><code>## [1] 0.9668994</code></pre>
+<pre class="r"><code>vol_pf = sqrt( t(x)%*%sigma.mat%*%x)[1,1]
+vol_pf</code></pre>
+<pre><code>## [1] 0.1935797</code></pre>
+<pre class="r"><code>contribs = x *(sigma.mat%*%x/vol_pf)
+contribs</code></pre>
+<pre><code>##            [,1]
+## [1,] 0.06951839
+## [2,] 0.05334430
+## [3,] 0.04071524
+## [4,] 0.03000180</code></pre>
+<p>Changing the objective function destroys the ERC property.</p>
+</div>
+<div id="derivation-of-the-mathematics" class="section level2">
+<h2>Derivation of the mathematics</h2>
+<p>Let us see why <span class="math inline">\(c^{\ast} = c - n \ln(
+\sum_{i=1}^n y_i^{\ast})\)</span> gives the correct solution. Looking at
+the constraint <span class="math inline">\(\sum_{i=1}^n \ln x_i \ge
+c^{\ast}\)</span> it follows due to the Kuhn–Tucker conditions that the
+inequality is actually reached: <span class="math display">\[
+\sum_{i=1}^n \ln x_i = c^*
+\]</span> Then we insert for <span class="math inline">\(c^*\)</span>
+and due to the choice of <span class="math inline">\(c\)</span> we can
+also insert <span class="math inline">\(c = \sum_{i=1}^n
+\ln(y_i^{\ast})\)</span>: <span class="math display">\[\begin{align*}
+\sum_{i=1}^n \ln x_i &amp;= c - n \ln( \sum_{i=1}^n y_i^{\ast}) \\
+\sum_{i=1}^n \ln x_i &amp;= \sum_{i=1}^n \ln(y_i^{\ast}) - n \ln(
+\sum_{i=1}^n y_i^{\ast})  \\
+\sum_{i=1}^n \ln x_i &amp;= \sum_{i=1}^n \ln \left(
+\frac{y_i^{\ast}}{\sum_{i=1}^n y_i^{\ast}} \right).
+\end{align*}\]</span></p>
+</div>
 </div>
 
 
