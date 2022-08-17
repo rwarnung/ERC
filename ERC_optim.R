@@ -1,7 +1,7 @@
 #' ---
 #' title: "Equally-Weighted Risk Contributions by optimization "
 #' author: "Richard Warnung"
-#' date: "July 8, 2022"
+#' date: "August 17, 2022"
 #'---
 
 #' # Introduction
@@ -232,7 +232,7 @@ contribs
 #' Thus, the resulting volatility is scaled by $\phi$.
 #' As 
 #' $$y_i^{\ast} > 0$$ for $i=1,\ldots,n$, also $\phi>0$ and thus $$x^{*}_i > 0$$ for $i=1,\ldots,n$.
-#' Finally, looking at the logarithmic constraint we have from the optimality of $y*$ that
+#' Finally, looking at the logarithmic constraint we have from the optimality of $y^*$ that
 #' \begin{align*}
 #'  \sum_{i=1}^n \ln y_i^* &\ge c \\
 #'  \sum_{i=1}^n \ln \left(x_i^*\phi \right) &\ge c \\
