@@ -242,18 +242,27 @@ Changing the objective function destroys the ERC property.
 
 ## Derivation of the mathematics
 
-Let us see why $c^{\ast} = c - n \ln( \sum_{i=1}^n y_i^{\ast})$ gives the correct solution.
-Looking at the constraint $\sum_{i=1}^n \ln x_i \ge c^{\ast}$ it follows due to the Kuhn–Tucker conditions that the inequality is actually reached:
-$$
- \sum_{i=1}^n \ln x_i = c^*
-$$
-Then we insert for $c^*$ and due to the choice of $c$ we can also insert $c = \sum_{i=1}^n \ln(y_i^{\ast})$:
-\begin{align*}
- \sum_{i=1}^n \ln x_i &= c - n \ln( \sum_{i=1}^n y_i^{\ast}) \\
- \sum_{i=1}^n \ln x_i &= \sum_{i=1}^n \ln(y_i^{\ast}) - n \ln( \sum_{i=1}^n y_i^{\ast})  \\
- \sum_{i=1}^n \ln x_i &= \sum_{i=1}^n \ln \left( \frac{y_i^{\ast}}{\sum_{i=1}^n y_i^{\ast}} \right).
-\end{align*}
+Let us see why $c^{\ast} = c - n \ln( \sum_{i=1}^n y_i^{\ast})$ gives the correct solution. This part of the post roughly reflects personal communications with in the of
+the authors of the mentioned article.
 
+We consider $x^* := y^* \phi$, where $\phi = 1/\sum_{i=1}^n y^*_i$. Thus $x^*$ is the re-scaled ERC-portfolio satisfying $\sum_{i=1}^n x^*_i = 1$.
+
+By definition of $x^*$, it holds that
+$$  \sqrt{x^{*T} \Sigma x^*} =  \phi \sqrt{y^{*T} \Sigma y^*}.$$ 
+Thus, the resulting volatility is scaled by $\phi$.
+As 
+$$y_i^{\ast} > 0$$ for $i=1,\ldots,n$, also $\phi>0$ and thus $$x^{*}_i > 0$$ for $i=1,\ldots,n$.
+Finally, looking at the logarithmic constraint we have from the optimality of $y*$ that
+\begin{align*}
+ \sum_{i=1}^n \ln y_i^* &\ge c \\
+ \sum_{i=1}^n \ln \left(x_i^*\phi \right) &\ge c \\
+ \sum_{i=1}^n \ln(x_i^*) - \sum_{i=1}^n \ln( \phi) &\ge c \\
+ \sum_{i=1}^n \ln(x_i^*) &\ge c + n \ln( \phi)
+\end{align*}
+and as $\phi = 1/\sum_{i=1}^n(y^*_i)$ we arrive at
+$$
+\sum_{i=1}^n \ln(x_i^*) \ge c - n \ln(\sum_{i=1}^n y^*_i).
+$$
 
 ```{r include=FALSE}
 options(warn = oldw)

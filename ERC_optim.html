@@ -652,21 +652,27 @@ contribs</code></pre>
 <div id="derivation-of-the-mathematics" class="section level2">
 <h2>Derivation of the mathematics</h2>
 <p>Let us see why <span class="math inline">\(c^{\ast} = c - n \ln(
-\sum_{i=1}^n y_i^{\ast})\)</span> gives the correct solution. Looking at
-the constraint <span class="math inline">\(\sum_{i=1}^n \ln x_i \ge
-c^{\ast}\)</span> it follows due to the Kuhn–Tucker conditions that the
-inequality is actually reached: <span class="math display">\[
-\sum_{i=1}^n \ln x_i = c^*
-\]</span> Then we insert for <span class="math inline">\(c^*\)</span>
-and due to the choice of <span class="math inline">\(c\)</span> we can
-also insert <span class="math inline">\(c = \sum_{i=1}^n
-\ln(y_i^{\ast})\)</span>: <span class="math display">\[\begin{align*}
-\sum_{i=1}^n \ln x_i &amp;= c - n \ln( \sum_{i=1}^n y_i^{\ast}) \\
-\sum_{i=1}^n \ln x_i &amp;= \sum_{i=1}^n \ln(y_i^{\ast}) - n \ln(
-\sum_{i=1}^n y_i^{\ast})  \\
-\sum_{i=1}^n \ln x_i &amp;= \sum_{i=1}^n \ln \left(
-\frac{y_i^{\ast}}{\sum_{i=1}^n y_i^{\ast}} \right).
-\end{align*}\]</span></p>
+\sum_{i=1}^n y_i^{\ast})\)</span> gives the correct solution. This part
+of the post roughly reflects personal communications with in the of the
+authors of the mentioned article.</p>
+<p>We consider <span class="math inline">\(x^* := y^* \phi\)</span>,
+where <span class="math inline">\(\phi = 1/\sum_{i=1}^n y^*_i\)</span>.
+Thus <span class="math inline">\(x^*\)</span> is the re-scaled
+ERC-portfolio satisfying <span class="math inline">\(\sum_{i=1}^n x^*_i
+= 1\)</span>.</p>
+<p>By definition of <span class="math inline">\(x^*\)</span>, it holds
+that <span class="math display">\[  \sqrt{x^{*T} \Sigma x^*} =  \phi
+\sqrt{y^{*T} \Sigma y^*}.\]</span> Thus, the resulting volatility is
+scaled by <span class="math inline">\(\phi\)</span>. As <span class="math display">\[y_i^{\ast} &gt; 0\]</span> for <span class="math inline">\(i=1,\ldots,n\)</span>, also <span class="math inline">\(\phi&gt;0\)</span> and thus <span class="math display">\[x^{*}_i &gt; 0\]</span> for <span class="math inline">\(i=1,\ldots,n\)</span>. Finally, looking at the
+logarithmic constraint we have from the optimality of <span class="math inline">\(y*\)</span> that <span class="math display">\[\begin{align*}
+\sum_{i=1}^n \ln y_i^* &amp;\ge c \\
+\sum_{i=1}^n \ln \left(x_i^*\phi \right) &amp;\ge c \\
+\sum_{i=1}^n \ln(x_i^*) - \sum_{i=1}^n \ln( \phi) &amp;\ge c \\
+\sum_{i=1}^n \ln(x_i^*) &amp;\ge c + n \ln( \phi)
+\end{align*}\]</span> and as <span class="math inline">\(\phi =
+1/\sum_{i=1}^n(y^*_i)\)</span> we arrive at <span class="math display">\[
+\sum_{i=1}^n \ln(x_i^*) \ge c - n \ln(\sum_{i=1}^n y^*_i).
+\]</span></p>
 </div>
 </div>
 
